@@ -83,7 +83,18 @@ function showDiceAnimation(result, onComplete) {
   }, 1000);
 }
 $('create').onclick=()=>connect('create');$('join').onclick=()=>connect('join');$('start').onclick=()=>message('start');$('roll').onclick=()=>{
-  if(diceAnimationActive)return;
+  if(diceAnimationActive || waitingForDiceResult)return;
+
+  const player = state.players.find(p=>p.id===state.you);
+
+  if(player.position===40){
+    message('roll');
+    return;
+  }
+
+  previousDicePosition = player.position;
+  waitingForDiceResult = true;
+
   message('roll');
 };
 $('copy').onclick=()=>navigator.clipboard?.writeText(state.code).then(()=>{$('copy').textContent='Copied!'});
