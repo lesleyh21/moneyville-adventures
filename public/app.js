@@ -31,11 +31,20 @@ showDiceAnimation(actualRoll, ()=>{
   if(rolledTooHigh){
     const needed = 40 - previousDicePosition;
 
-    alert(
-      `🎲 Oops! You rolled a ${actualRoll}!\n\n` +
-      `You need exactly ${needed} to reach the Bicycle Shop.\n\n` +
-      `Stay on Space ${previousDicePosition} and try again next turn!`
-    );
+  const popup = document.createElement('div');
+popup.id = 'exact-roll-overlay';
+popup.className = 'exact-roll-overlay';
+popup.innerHTML = `
+  <div class="event-modal shop">
+    <h2>🎲 Oops! You Rolled Too High!</h2>
+    <p>You rolled a ${actualRoll}!</p>
+    <p>You need exactly ${needed} to reach the Bicycle Shop.</p>
+    <p>Stay on Space ${previousDicePosition} and try again next turn!</p>
+    <button id="close-exact-roll">OK!</button>
+  </div>
+`;
+document.body.appendChild(popup);
+popup.querySelector('#close-exact-roll').onclick = () => popup.remove();
   }
 });
 
