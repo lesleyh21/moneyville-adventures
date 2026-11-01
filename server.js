@@ -20,7 +20,7 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){let j=crypto.randomInt(i+1);[a
 function makeDecks(){return Object.fromEntries(categories.map(c=>[c,shuffle(decks[c].map((_,i)=>i))]))}
 function pick(room,category){let stack=room.decks[category];if(!stack.length)room.decks[category]=stack=shuffle(decks[category].map((_,i)=>i));const ix=stack.shift();stack.push(ix);return decks[category][ix]}
 function safePlayer(p){return{id:p.id,name:p.name,color:p.color,balance:p.balance,position:p.position,finished:p.finished,connected:!!p.ws&&p.ws.readyState===1}}
-function view(room){return{type:'state',code:room.code,status:room.status,host:room.host,players:room.players.map(safePlayer),turn:room.turn,round:room.round,pending:room.pending?{...room.pending}:null,log:room.log.slice(-12),pathTypes,labels,goal:100,winners:room.winners||[]}}
+function view(room){return{type:'state',code:room.code,status:room.status,host:room.host,players:room.players.map(safePlayer),turn:room.turn,round:room.round,pending:room.pending?{...room.pending}:null,log:room.log.slice(-12),pathTypes,labels,goal:100,winners:room.winners||[],lastRoll:room.lastRoll||null}}
 function broadcast(room){for(const p of room.players)if(p.ws)send(p.ws,{...view(room),you:p.id,rejoinToken:p.token})}
 function note(room,msg){room.log.push(msg);if(room.log.length>80)room.log.shift()}
 function playerTurn(room){return room.players[room.turn]}
@@ -46,9 +46,17 @@ if(data.type==='roll'){
     act(room,p,'earn');
     return;
   }
-  const roll=crypto.randomInt(1,4);
-  p.position=Math.min(40,p.position+roll);
-  note(room,`${p.name} rolled ${roll} and moved to space ${p.position}.`);
+const roll=crypto.randomInt(1,4);
+room.lastRoll = { player: p.id, value: roll };
+ 
+if(p.position+roll>40){
+  note(room,`${p.name} rolled ${roll}, but needs exactly ${40-p.position} to reach the Bicycle Shop. Turn skipped!`);
+  next(room);
+  return;
+}
+
+p.position+=roll;  
+ note(room,`${p.name} rolled ${roll} and moved to space ${p.position}.`);
   act(room,p,pathTypes[p.position-1]);
   return;
 }
