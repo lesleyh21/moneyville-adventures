@@ -14,22 +14,35 @@ const icons = {
     const previousState = state;
   state = m;
 
-  if(waitingForDiceResult){
-    const player = m.players.find(p=>p.id===m.you);
+if(waitingForDiceResult){
+  const player = m.players.find(p=>p.id===m.you);
 
-    if(player && player.position > previousDicePosition){
-      waitingForDiceResult = false;
+  if(m.lastRoll && m.lastRoll.player===m.you){      
+    waitingForDiceResult = false;
 
       const movement = player.position - previousDicePosition;
+      const actualRoll = m.lastRoll.value;
+      const rolledTooHigh =
+        previousDicePosition + actualRoll > 40;
+    
+showDiceAnimation(actualRoll, ()=>{
+  render();
 
-      showDiceAnimation(movement, ()=>{
-        render();
-      });
+  if(rolledTooHigh){
+    const needed = 40 - previousDicePosition;
+
+    alert(
+      `🎲 Oops! You rolled a ${actualRoll}!\n\n` +
+      `You need exactly ${needed} to reach the Bicycle Shop.\n\n` +
+      `Stay on Space ${previousDicePosition} and try again next turn!`
+    );
+  }
+});
 
     }
   }  
   
-  if(m.rejoinToken){localStorage.setItem('moneyville-token-'+m.code,m.rejoinToken);localStorage.setItem('moneyville-room',m.code);localStorage.setItem('moneyville-name',m.players.find(p=>p.id===m.you)?.name||name)}render()}};socket.onclose=()=>showError('Disconnected from the server. Reconnect using the same name and room code.')}function showError(s){$('error').textContent=s}function render(){showError('');$('entry').hidden=true;$('game').hidden=false;$('roomcode').textContent=state.code;$('status').textContent=state.status==='lobby'?'Waiting for players (2-5).':state.status==='playing'?`Round ${state.round} - Game in progress`:'Game complete!';$('start').hidden=!(state.status==='lobby'&&state.you===state.host);$('start').disabled=state.players.length<2;const p=state.players[state.turn];$('turn').innerHTML=state.status==='lobby'?'<b>Waiting to start</b>':state.status==='finished'?`<b>${'\u{1F3C6}'} Adventure complete!</b>`:`<b>Current player: ${esc(p.name)}</b><p>${p.position===40?'Bicycle Shop Savings Challenge':`Space ${p.position} - $${p.balance} saved`}</p>`;const cells=[{position:0,category:'start'},...state.pathTypes.map((category,i)=>({position:i+1,category}))];$('board').innerHTML=cells.map(c=>{let people=state.players.filter(p=>p.position===c.position);return `<div class="space ${c.category==='start'?'startspace':c.category}" title="${esc(state.labels[c.category]||'START')}"><strong>${c.position||'START'}</strong><span class="symbol">${icons[c.category]||'\u{1F6A9}'}</span><span class="tokens">${people.map(p=>`<span class="token" title="${esc(p.name)}" style="background:${p.color}"></span>`).join('')}</span></div>`}).join('');$('players').innerHTML=state.players.map(x=>`<div class="person ${p?.id===x.id&&state.status==='playing'?'active':''}"><span class="token" style="background:${x.color}"></span><strong>${esc(x.name)}${x.id===state.you?' (you)':''}</strong><span>${'\u{1F4B0}'} $${x.balance}</span><small>${x.finished?'\u{1F6B2} Bought bicycle':x.position===40?'At shop':`Space ${x.position}`}${!x.connected?' - offline':''}</small></div>`).join('');$('log').innerHTML=[...state.log].reverse().map(x=>`<p>${esc(x)}</p>`).join('');let yourTurn=state.status==='playing'&&p.id===state.you;let pending=state.pending;$('roll').hidden=!(yourTurn&&!pending);$('roll').textContent = p.position === 40
+  if(m.rejoinToken){localStorage.setItem('moneyville-token-'+m.code,m.rejoinToken);localStorage.setItem('moneyville-room',m.code);localStorage.setItem('moneyville-name',m.players.find(p=>p.id===m.you)?.name||name)}if(!diceAnimationActive){render()}}};socket.onclose=()=>showError('Disconnected from the server. Reconnect using the same name and room code.')}function showError(s){$('error').textContent=s}function render(){showError('');$('entry').hidden=true;$('game').hidden=false;$('roomcode').textContent=state.code;$('status').textContent=state.status==='lobby'?'Waiting for players (2-5).':state.status==='playing'?`Round ${state.round} - Game in progress`:'Game complete!';$('start').hidden=!(state.status==='lobby'&&state.you===state.host);$('start').disabled=state.players.length<2;const p=state.players[state.turn];$('turn').innerHTML=state.status==='lobby'?'<b>Waiting to start</b>':state.status==='finished'?`<b>${'\u{1F3C6}'} Adventure complete!</b>`:`<b>Current player: ${esc(p.name)}</b><p>${p.position===40?'Bicycle Shop Savings Challenge':`Space ${p.position} - $${p.balance} saved`}</p>`;const cells=[{position:0,category:'start'},...state.pathTypes.map((category,i)=>({position:i+1,category}))];$('board').innerHTML=cells.map(c=>{let people=state.players.filter(p=>p.position===c.position);return `<div class="space ${c.category==='start'?'startspace':c.category}" title="${esc(state.labels[c.category]||'START')}"><strong>${c.position||'START'}</strong><span class="symbol">${icons[c.category]||'\u{1F6A9}'}</span><span class="tokens">${people.map(p=>`<span class="token" title="${esc(p.name)}" style="background:${p.color}"></span>`).join('')}</span></div>`}).join('');$('players').innerHTML=state.players.map(x=>`<div class="person ${p?.id===x.id&&state.status==='playing'?'active':''}"><span class="token" style="background:${x.color}"></span><strong>${esc(x.name)}${x.id===state.you?' (you)':''}</strong><span>${'\u{1F4B0}'} $${x.balance}</span><small>${x.finished?'\u{1F6B2} Bought bicycle':x.position===40?'At shop':`Space ${x.position}`}${!x.connected?' - offline':''}</small></div>`).join('');$('log').innerHTML=[...state.log].reverse().map(x=>`<p>${esc(x)}</p>`).join('');let yourTurn=state.status==='playing'&&p.id===state.you;let pending=state.pending;$('roll').hidden=!(yourTurn&&!pending);$('roll').textContent = p.position === 40
   ? '\u{1F4BC} Draw Earn Money Card'
   : '\u{1F3B2} Roll 1-3';if(state.status==='finished'){$('card').innerHTML=`<p class="winner">${'\u{1F3C6}'} Winner: ${state.players.filter(p=>state.winners.includes(p.id)).map(p=>esc(p.name)).join(', ')}</p><p>Players who reached $100 completed their bicycle purchase!</p>`}else if(pending){let canChoose=yourTurn&&pending.player===state.you;let buttons=(pending.choices||[]).map(c=>{let blocked=(c==='buy'||c==='invest')&&p.balance<pending.price;return `<button class="choice" data-choice="${c}" ${!canChoose||blocked?'disabled':''}>${c==='buy'?`Buy ($${pending.price})`:c==='save'?'Save money':c==='invest'?`Invest ($${pending.price})`:'Skip investment'}</button>`}).join('');const amount=pending.amount||0;const summary=pending.result?`<div class="event-result"><strong class="${amount<0?'loss':'gain'}">${amount>0?'+':''}$${amount}</strong><p>Savings: $${pending.before} -> $${pending.after}</p></div>`:'';const continueButton=pending.result?`<button id="continue-card" ${canChoose?'':'disabled'}>${canChoose?'Continue to next turn':'Waiting for the current player'}</button>`:'';$('card').innerHTML=`<div class="card ${pending.category}"><strong>${esc(state.labels[pending.category])}</strong><h3>${esc(pending.title)}</h3><p>${esc(pending.description)}</p>${summary}${buttons}${continueButton}</div>${!canChoose?'<p class="muted">Waiting for the current player.</p>':''}`;$('card').querySelectorAll('[data-choice]').forEach(b=>b.onclick=()=>message('choose',{choice:b.dataset.choice}));const btn=$('continue-card');if(btn&&canChoose)btn.onclick=()=>message('continue');}else{$('card').innerHTML=state.status==='lobby'?'<p>Invite players using your room code, then start!</p>':yourTurn?'<p>Your turn! Roll the die or draw a job card at the Bicycle Shop.</p>':'<p>Wait for your turn.</p>'}
 if(!diceAnimationActive){
