@@ -77,7 +77,11 @@ function showDiceAnimation(result, onComplete) {
     }, 700);
   }, 1000);
 }
-$('create').onclick=()=>connect('create');$('join').onclick=()=>connect('join');$('start').onclick=()=>message('start');$('roll').onclick=()=>message('roll');$('copy').onclick=()=>navigator.clipboard?.writeText(state.code).then(()=>{$('copy').textContent='Copied!'});
+$('create').onclick=()=>connect('create');$('join').onclick=()=>connect('join');$('start').onclick=()=>message('start');$('roll').onclick=()=>{
+  if(diceAnimationActive)return;
+  message('roll');
+};
+$('copy').onclick=()=>navigator.clipboard?.writeText(state.code).then(()=>{$('copy').textContent='Copied!'});
 
 // Pre-fill previous room for easy reconnection after a tab closes.
 $("code").value=localStorage.getItem("moneyville-room")||"";$("name").value=localStorage.getItem("moneyville-name")||"";
