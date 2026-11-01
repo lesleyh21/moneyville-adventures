@@ -1,4 +1,9 @@
-const $=id=>document.getElementById(id);let socket,state;const icons = {
+const $=id=>document.getElementById(id);
+let socket,state;
+let waitingForDiceResult = false;
+let previousDicePosition = 0;
+
+const icons = {
   earn: '\u{1FA99}',
   shop: '\u{1F6CD}\uFE0F',
   save: '\u{1F437}',
