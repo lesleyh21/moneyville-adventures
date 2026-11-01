@@ -35,5 +35,35 @@ if(data.type==='join'){if(ws.room)return err(ws,'Already in a room');room=rooms.
 if(!room||!p)return err(ws,'Join a room first');if(data.type==='start'){if(p.id!==room.host)return err(ws,'Only the host can start');if(room.players.length<2)return err(ws,'At least two players are needed');if(room.status!=='lobby')return;room.status='playing';note(room,'The adventure begins! Each player has $10.');broadcast(room);return}
 if(room.status!=='playing'&&!(room.status==='finished'&&data.type==='continue'))return err(ws,'Game is not active');
 if(data.type==='continue'){if(!room.pending||!room.pending.result||room.pending.player!==p.id)return err(ws,'No completed card to continue');if(room.status==='finished'){room.pending=null;broadcast(room);return}next(room);return}
+if(room.status!=='playing')return err(ws,'Game is not active');
+if(playerTurn(room)!==p)return err(ws,'Wait for your turn');
+
+if(data.type==='roll'){
+  if(room.pending)return err(ws,'Finish the card first');
+  if(p.finished)return;
+  if(p.position===40){
+    note(room,`${p.name} is working at the Bicycle Shop.`);
+    act(room,p,'earn');
+    return;
+  }
+  const roll=crypto.randomInt(1,4);
+  p.position=Math.min(40,p.position+roll);
+  note(room,`${p.name} rolled ${roll} and moved to space ${p.position}.`);
+  act(room,p,pathTypes[p.position-1]);
+  return;
+}
+
+if(data.type==='choose'){
+  if(!room.pending||room.pending.result||room.pending.player!==p.id)
+    return err(ws,'No card decision is waiting');
+  const choice=String(data.choice);
+  if(!room.pending.choices.includes(choice))
+    return err(ws,'Invalid choice');
+  if((choice==='buy'||choice==='invest')&&p.balance<room.pending.price)
+    return err(ws,'Not enough savings');
+  resolve(room,p,room.activeCard,room.pending.category,choice);
+  return;
+}
+}
 wss.on('connection',ws=>{ws.on('message',msg=>{try{handle(ws,msg)}catch(e){console.error(e);err(ws,'An unexpected error occurred')}});ws.on('close',()=>{const r=ws.room;if(!r)return;const p=r.players.find(x=>x.id===ws.pid);if(!p)return;if(p.ws!==ws)return;p.ws=null;if(r.status==='lobby'){r.players=r.players.filter(x=>x!==p);if(r.host===p.id)r.host=r.players[0]?.id||null;if(!r.players.length){rooms.delete(r.code);return}}else{note(r,`${p.name} disconnected. The host may need to restart the room.`)}broadcast(r)})});
 server.listen(PORT,()=>console.log(`Moneyville online at http://localhost:${PORT}`));
