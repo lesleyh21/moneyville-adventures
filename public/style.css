@@ -106,3 +106,7 @@
   box-shadow: 0 3px 8px rgba(35, 49, 77, 0.12);
   pointer-events: none;
 }
+/* Moneyville town decorations area */
+.board {
+  padding-top: 85px;
+}
