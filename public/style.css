@@ -93,7 +93,7 @@
 
 /* Give the Bicycle Shop more room */
 .board .space:nth-child(41) {
-  transform: translateY(-8px);
+  transform: translateX(12px);
 }
 
 /* Moneyville illustrated game board */
