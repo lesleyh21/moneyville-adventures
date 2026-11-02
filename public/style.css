@@ -118,7 +118,7 @@
   left: 12px;
   right: 12px;
   text-align: justify;
-text-align-last: justify;
+text-align-last: auto;
   
   font-size: 23px;
   white-space: nowrap;
