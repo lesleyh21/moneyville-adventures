@@ -110,21 +110,7 @@
 .board {
   padding-top: 85px;
 }
-/* Moneyville town skyline */
-.board::before {
-  content: "🌳  🏪 Market     🏦 Bank     🌳 🌲     🏫 School  🌳";
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  right: 12px;
-  text-align: justify;
-text-align-last: center;
-  
-  font-size: 23px;
-  white-space: nowrap;
-  overflow: hidden;
-  pointer-events: none;
-}
+
 /* Moneyville illustrated game board */
 .board {
   background-image: url("moneyville-town.png");
