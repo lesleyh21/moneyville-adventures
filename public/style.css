@@ -85,3 +85,24 @@
 .board .space:nth-child(22) {
   grid-column: 2;
 }
+
+/* Bicycle Shop decoration */
+.board {
+  position: relative;
+}
+
+.board::after {
+  content: "🏪 🚲 Bicycle Shop";
+  position: absolute;
+  bottom: 22px;
+  left: 18px;
+  background: #fff2c6;
+  border: 2px solid #e8b85a;
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #65451f;
+  box-shadow: 0 3px 8px rgba(35, 49, 77, 0.12);
+  pointer-events: none;
+}
