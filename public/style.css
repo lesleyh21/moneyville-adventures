@@ -91,6 +91,11 @@
   padding-top: 125px;
 }
 
+/* Give the Bicycle Shop more room */
+.board .space:nth-child(41) {
+  transform: translateY(-8px);
+}
+
 /* Moneyville illustrated game board */
 .board {
   background-image: url("moneyville-town.png");
