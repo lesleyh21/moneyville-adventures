@@ -117,7 +117,9 @@
   top: 12px;
   left: 12px;
   right: 12px;
-  text-align: center;
+  text-align: justify;
+text-align-last: justify;
+  
   font-size: 23px;
   white-space: nowrap;
   overflow: hidden;
