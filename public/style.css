@@ -125,3 +125,10 @@ text-align-last: center;
   overflow: hidden;
   pointer-events: none;
 }
+/* Moneyville illustrated game board */
+.board {
+  background-image: url("../Moneyville%20Adventures%20Game%20Board.png");
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
